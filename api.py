@@ -24,7 +24,7 @@ def songName():
     # Check if an name was provided as part of the URL.
     # If not, then return an error in the HTTP response.
     if 'name' in request.args:
-        name = int(request.args['name'])
+        name = request.args['name']
     else:
         return "Error: No name field provided. Please specify an name."
 
@@ -36,7 +36,7 @@ def songRecommendation():
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
     if 'key' in request.args:
-        key = int(request.args['key'])
+        key = request.args['key']
     else:
         return "Error: No key field provided. Please specify an key."
 
