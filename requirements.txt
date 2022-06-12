@@ -5,5 +5,4 @@ flask
 numpy
 opencv-python
 numba
-pickle
 fuzzywuzzy
