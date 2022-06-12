@@ -3,7 +3,7 @@ gunicorn
 django-heroku
 flask
 numpy
-cv2
+opencv-python
 numba
 math
 pickle
