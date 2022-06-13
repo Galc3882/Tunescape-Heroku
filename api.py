@@ -67,7 +67,7 @@ def takeSecond(elem):
 
 
 if __name__ == '__main__':
-    with open('database.pickle', 'rb') as handle:
+    with open('staticfiles\database.pickle', 'rb') as handle:
         global database
         database = pickle.load(handle)
 
