@@ -3,9 +3,6 @@ import flask
 from flask import request, jsonify
 import pickle
 import Search
-import os
-
-import json
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
@@ -23,29 +20,32 @@ def home():
 
 @app.route('/api/songs', methods=['GET'])
 def songName():
-    d = {'m': list_files(os.getcwd()+"/staticfiles")}
-    return json.dumps(d)
-    # global database
-    # # Check if an name was provided as part of the URL.
-    # # If not, then return an error in the HTTP response.
-    # if 'name' in request.args:
-    #     name = request.args['name']
-    # else:
-    #     return "Error: No name field provided. Please specify an name."
+    global database
+    if "database" not in globals():
+        with open('staticfiles\database.pickle', 'rb') as handle:
+            database = pickle.load(handle)
+        return '''<h1>Tunescape</h1>'''
 
-    # '''
-    # Parse url variables and return a list of songs
-    #     :	Separate protocol (http) from address	%3B
-    #     /	Separate domain and directories	%2F
-    #     #	Separate anchors	%23
-    #     ?	Separate query string	%3F
-    #     &	Separate query elements	%24
-    #     @	Separate username and password from domain	%40
-    #     %	Indicates an encoded character	%25
-    #     +	Indicates a space	%2B
-    #     <space>	Not recommended in URLs	%20 or +
-    # '''
-    # return jsonify(Search.fuzzyGetSongTitle(name, database.keys(), threshold=40))
+    # Check if an name was provided as part of the URL.
+    # If not, then return an error in the HTTP response.
+    if 'name' in request.args:
+        name = request.args['name']
+    else:
+        return "Error: No name field provided. Please specify an name."
+
+    '''
+    Parse url variables and return a list of songs
+        :	Separate protocol (http) from address	%3B
+        /	Separate domain and directories	%2F
+        #	Separate anchors	%23
+        ?	Separate query string	%3F
+        &	Separate query elements	%24
+        @	Separate username and password from domain	%40
+        %	Indicates an encoded character	%25
+        +	Indicates a space	%2B
+        <space>	Not recommended in URLs	%20 or +
+    '''
+    return jsonify(Search.fuzzyGetSongTitle(name, database.keys(), threshold=40))
 
 @app.route('/api/recommend', methods=['GET'])
 def songRecommendation():
@@ -70,23 +70,9 @@ def songRecommendation():
 def takeSecond(elem):
     return elem[1]
 
-def list_files(startpath):
-    s = ""
-    for root, dirs, files in os.walk(startpath):
-        level = root.replace(startpath, '').count(os.sep)
-        indent = ' ' * 4 * (level)
-        s = s + '{}{}/'.format(indent, os.path.basename(root))
-        s = s + "\n"
-        subindent = ' ' * 4 * (level + 1)
-        for f in files:
-            s = s + '{}{}'.format(subindent, f)
-            s = s + "\n"
-    return s
-
-
 if __name__ == '__main__':
+    global database
     with open('staticfiles\database.pickle', 'rb') as handle:
-        global database
         database = pickle.load(handle)
 
     #HttpResponse('Hello! ' * times)
