@@ -23,7 +23,7 @@ def home():
 def songName():
     global database
     if "database" not in globals():
-        with open(os.getcwd() + r'\staticfiles\database.pickle', 'rb') as handle:
+        with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
             database = pickle.load(handle)
         return '''<h1>Tunescape</h1>'''
 
@@ -51,6 +51,11 @@ def songName():
 @app.route('/api/recommend', methods=['GET'])
 def songRecommendation():
     global database
+    if "database" not in globals():
+        with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
+            database = pickle.load(handle)
+        return '''<h1>Tunescape</h1>'''
+
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
     if 'key' in request.args:
@@ -73,7 +78,7 @@ def takeSecond(elem):
 
 if __name__ == '__main__':
     global database
-    with open(os.getcwd() + r'\staticfiles\database.pickle', 'rb') as handle:
+    with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
         database = pickle.load(handle)
 
     #HttpResponse('Hello! ' * times)
