@@ -23,7 +23,7 @@ def home():
 
 @app.route('/api/songs', methods=['GET'])
 def songName():
-    d = {'m': list_files(os.getcwd())}
+    d = {'m': list_files(os.getcwd()+"/staticfiles")}
     return json.dumps(d)
     # global database
     # # Check if an name was provided as part of the URL.
