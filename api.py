@@ -3,6 +3,7 @@ import flask
 from flask import request, jsonify
 import pickle
 import Search
+import os
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
@@ -22,7 +23,7 @@ def home():
 def songName():
     global database
     if "database" not in globals():
-        with open('staticfiles\database.pickle', 'rb') as handle:
+        with open(os.getcwd() + r'\staticfiles\database.pickle', 'rb') as handle:
             database = pickle.load(handle)
         return '''<h1>Tunescape</h1>'''
 
@@ -72,7 +73,7 @@ def takeSecond(elem):
 
 if __name__ == '__main__':
     global database
-    with open('staticfiles\database.pickle', 'rb') as handle:
+    with open(os.getcwd() + r'\staticfiles\database.pickle', 'rb') as handle:
         database = pickle.load(handle)
 
     #HttpResponse('Hello! ' * times)
