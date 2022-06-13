@@ -3,7 +3,7 @@ import flask
 from flask import request, jsonify
 import pickle
 import Search
-import os
+from urllib.request import urlopen
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
@@ -23,8 +23,7 @@ def home():
 def songName():
     global database
     if "database" not in globals():
-        with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
-            database = pickle.load(handle)
+        database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
 
     # Check if an name was provided as part of the URL.
     # If not, then return an error in the HTTP response.
@@ -51,8 +50,7 @@ def songName():
 def songRecommendation():
     global database
     if "database" not in globals():
-        with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
-            database = pickle.load(handle)
+        database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
 
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
@@ -76,8 +74,7 @@ def takeSecond(elem):
 
 if __name__ == '__main__':
     global database
-    with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
-        database = pickle.load(handle)
+    database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
 
     #HttpResponse('Hello! ' * times)
     app.run()
