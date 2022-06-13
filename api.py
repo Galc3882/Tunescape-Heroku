@@ -25,7 +25,6 @@ def songName():
     if "database" not in globals():
         with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
             database = pickle.load(handle)
-        return '''<h1>Tunescape</h1>'''
 
     # Check if an name was provided as part of the URL.
     # If not, then return an error in the HTTP response.
@@ -54,7 +53,6 @@ def songRecommendation():
     if "database" not in globals():
         with open(os.getcwd() + r'/staticfiles/database.pickle', 'rb') as handle:
             database = pickle.load(handle)
-        return '''<h1>Tunescape</h1>'''
 
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
