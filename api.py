@@ -9,14 +9,9 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = False
 
 
-@app.route('/', methods=['GET'])
-def home():
-    return '''<h1>Tunescape</h1>'''
-
-
-# @app.route('/api/v1/resources/books/all', methods=['GET'])
-# def api_all():
-#     return jsonify(books)
+# @app.route('/', methods=['GET'])
+# def home():
+#     return '''<h1>Tunescape</h1>'''
 
 
 @app.route('/api/songs', methods=['GET'])
@@ -32,18 +27,6 @@ def songName():
     else:
         return "Error: No name field provided. Please specify an name."
 
-    '''
-    Parse url variables and return a list of songs
-        :	Separate protocol (http) from address	%3B
-        /	Separate domain and directories	%2F
-        #	Separate anchors	%23
-        ?	Separate query string	%3F
-        &	Separate query elements	%24
-        @	Separate username and password from domain	%40
-        %	Indicates an encoded character	%25
-        +	Indicates a space	%2B
-        <space>	Not recommended in URLs	%20 or +
-    '''
     return jsonify(Search.fuzzyGetSongTitle(name, database.keys(), threshold=40))
 
 @app.route('/api/recommend', methods=['GET'])
