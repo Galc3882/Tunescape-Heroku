@@ -21,13 +21,8 @@ def fuzzyGetSongTitle(songTitle, data, threshold=60):
             i += 1
     if len(ratio) == 0:
         return None
-    elif len(ratio) > 1:
-        print("Multiple songs found:")
-        for j in range(len(ratio)):
-            print(str(j+1)+". "+ratio[j][0].split('\0')[0]+" by " + ratio[j][0].split('\0')[1])
-        k = input("Please enter the number of the song you want to use: ")
-        return ratio[int(k)-1][0]
-    return ratio[0][0]
+    else:
+        return ratio
 
 
 def findSimilarSongs(song, data, numOfSongs=1):
@@ -39,21 +34,11 @@ def findSimilarSongs(song, data, numOfSongs=1):
     if numOfSongs > len(data):
         numOfSongs = len(data)-1
 
-    # measure the time it takes to find the most similar songs
-    starttime = time.time()
-    i = 0
-
     data.pop(song[0] + '\0' + song[1])
 
     # Calculate the cosine similarity between the song and all the songs in the database
     similarSongs = []
     for row in data.items():
-
-        # every 500 songs, print the time it took to find the most similar songs
-        if i % 500 == 0:
-            pass
-            #print("Songs processed: " + str(i) + "\t|\t " + str(int(i*100/len(data))) + "%\t|\t Time: {:.2f}".format(time.time() - starttime))
-        i += 1
 
         # Add the song to the list of songs if cosine similarity is above numOfSongs lowest similarity and delete the lowest similarity
         cosSim = cosineSimilarity(song, row[1])
@@ -67,8 +52,6 @@ def findSimilarSongs(song, data, numOfSongs=1):
                 similarSongs.append((row[0], cosSim))
                 if len(similarSongs) > numOfSongs:
                     similarSongs.pop(iMin)
-
-    print('That took {:.2f} seconds'.format(time.time() - starttime))
 
     return similarSongs
 
