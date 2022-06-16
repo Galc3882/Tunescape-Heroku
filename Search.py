@@ -111,31 +111,3 @@ def cosineSimilarity(song1, song2):
 
 def takeSecond(elem):
     return elem[1]
-
-
-def main(database, songKey):
-    # Find most similar song using cosine similarity
-    similarSongs = findSimilarSongs(database[songKey], database, 5)
-    sortedSimilarSongs = sorted(similarSongs, key=takeSecond, reverse=True)
-    print("Similar Songs: ")
-    for i in range(len(sortedSimilarSongs)):
-        print("Found Song: " + sortedSimilarSongs[i][0].split('\0')
-              [0]+" by " + sortedSimilarSongs[i][0].split('\0')[1])
-        print("Cosine Similarity: " + str(sortedSimilarSongs[i][1]))
-
-
-if __name__ == '__main__':
-    # Read from the pickle file
-    with open('database.pickle', 'rb') as handle:
-        database = pickle.load(handle)
-
-    # Ask for the song title
-    songTitle = input("Enter the song title: ")
-    # Find the song in the database
-    songKey = fuzzyGetSongTitle(songTitle, database.keys(), threshold=40)
-    if songKey is None:
-        print("Song not found within the threshold")
-    else:
-        print("Found Song: " + songKey.split('\0')
-              [0]+" by " + songKey.split('\0')[1])
-    main(database, songKey)
