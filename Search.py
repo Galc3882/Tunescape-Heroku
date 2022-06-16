@@ -1,8 +1,6 @@
-import pickle
 from fuzzywuzzy import process
 import numpy as np
 import FeatureSimilarity
-import time
 
 
 def fuzzyGetSongTitle(songTitle, data, threshold=60):
