@@ -79,7 +79,7 @@ def speed(tempo1, tempo2, time_signature1, time_signature2):
     if tempo1 == tempo2 and time_signature1 == time_signature2:
         return 1
     # sigmoid
-    return 1 / (1 + math.exp(-7*(max(1-0.01*abs(float(tempo1)/float(time_signature1) - float(tempo2)/float(time_signature2)), 0)-0.5)))
+    return 1 / (1 + math.exp(-7*(max(1-0.05*abs(float(tempo1)/float(time_signature1) - float(tempo2)/float(time_signature2)), 0)-0.5)))
 
 
 def loudness(loudness1, loudness2):

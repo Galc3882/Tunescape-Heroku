@@ -16,6 +16,9 @@ app.config["DEBUG"] = False
 
 @app.route('/api/songs', methods=['GET'])
 def songName():
+    '''
+    Returns a list of songs in the database that match the song title and their similarity score.
+    '''
     global database
     if "database" not in globals():
         database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
@@ -31,6 +34,9 @@ def songName():
 
 @app.route('/api/recommend', methods=['GET'])
 def songRecommendation():
+    '''
+    Returns a list of songs in the database that are similar to the song and their similarity score.
+    '''
     global database
     if "database" not in globals():
         database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))

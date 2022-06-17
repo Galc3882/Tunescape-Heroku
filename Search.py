@@ -26,7 +26,7 @@ def fuzzyGetSongTitle(songTitle, data, threshold=60):
 def findSimilarSongs(song, data, numOfSongs=1):
     """
     Finds the most similar songs to the song at the index.
-    Returns the most similar songs using cosinw similarity.
+    Returns the most similar songs using cosine similarity.
     """
     # Cap the number of songs to be returned
     if numOfSongs > len(data):
@@ -87,8 +87,8 @@ def cosineSimilarity(song1, song2):
     # Return dot product of weights and similarities
     return np.dot(weights, similarities)/np.sum(weights)
 
-# take second element for sort
-
-
 def takeSecond(elem):
+    '''
+    Take second element for sort
+    '''
     return elem[1]
