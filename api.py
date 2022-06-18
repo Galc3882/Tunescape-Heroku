@@ -23,7 +23,7 @@ def loadPickle():
     global database
     if "database" not in globals():
         database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
-        sleep(10)
+        sleep(100)
         return jsonify("Database loaded")
     return jsonify("Database already loaded")
 
@@ -34,7 +34,9 @@ def songName():
     '''
     global database
     if "database" not in globals():
-        return jsonify("Database not loaded")
+        sleep(0.1)
+        if "database" not in globals():
+            return jsonify("Database not loaded")
 
     # Check if an name was provided as part of the URL.
     # If not, then return an error in the HTTP response.
@@ -52,7 +54,9 @@ def songRecommendation():
     '''
     global database
     if "database" not in globals():
-        return jsonify("Database not loaded")
+        sleep(0.1)
+        if "database" not in globals():
+            return jsonify("Database not loaded")
 
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
