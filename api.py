@@ -23,8 +23,7 @@ def loadPickle():
     global database
     if "database" not in globals():
         database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
-        sleep(100)
-        return jsonify("Database loaded")
+        # return jsonify("Database loaded")
     return jsonify("Database already loaded")
 
 @app.route('/api/songs', methods=['GET'])
