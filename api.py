@@ -40,7 +40,7 @@ def songName():
     if 'name' in request.args:
         name = request.args['name']
     else:
-        return "Error: No name field provided. Please specify an name."
+        return "Error: No name field provided. Please specify a name."
 
     return jsonify(Search.fuzzyGetSongTitle(name, database.keys(), threshold=40))
 
@@ -59,7 +59,7 @@ def songRecommendation():
         key = request.args['key']
         key = key.replace('\\u0000', '\0') 
     else:
-        return "Error: No key field provided. Please specify an key."
+        return "Error: No key field provided. Please specify a key."
 
     # Find the most similar songs to the song with key.
     similarSongs = Search.findSimilarSongs(database[key], database, 5)
