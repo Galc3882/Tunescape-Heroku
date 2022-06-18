@@ -32,24 +32,22 @@ def findSimilarSongs(song, data, numOfSongs=1):
     if numOfSongs > len(data):
         numOfSongs = len(data)-1
 
-    data.pop(song[0] + '\0' + song[1])
-
     # Calculate the cosine similarity between the song and all the songs in the database
     similarSongs = []
     for row in data.items():
-
-        # Add the song to the list of songs if cosine similarity is above numOfSongs lowest similarity and delete the lowest similarity
-        cosSim = cosineSimilarity(song, row[1])
-        if cosSim < 0.4:
-            continue
-        if len(similarSongs) < numOfSongs:
-            similarSongs.append((row[0], cosSim))
-        else:
-            iMin = similarSongs.index(min(similarSongs, key=takeSecond))
-            if cosSim > similarSongs[iMin][1]:
+        if row[0] != song[0] + '\0' + song[1]:
+            # Add the song to the list of songs if cosine similarity is above numOfSongs lowest similarity and delete the lowest similarity
+            cosSim = cosineSimilarity(song, row[1])
+            if cosSim < 0.4:
+                continue
+            if len(similarSongs) < numOfSongs:
                 similarSongs.append((row[0], cosSim))
-                if len(similarSongs) > numOfSongs:
-                    similarSongs.pop(iMin)
+            else:
+                iMin = similarSongs.index(min(similarSongs, key=takeSecond))
+                if cosSim > similarSongs[iMin][1]:
+                    similarSongs.append((row[0], cosSim))
+                    if len(similarSongs) > numOfSongs:
+                        similarSongs.pop(iMin)
 
     return similarSongs
 
@@ -60,8 +58,13 @@ def cosineSimilarity(song1, song2):
     Returns the similarity value.
     """
 
+    # return 0 if time signature is different
+    if song1[7] != song2[7]:
+        return 0
+
     # Vector of weights for each feature
-    weights = np.array([0.02, 0.05, 1, 1, 0.65, 0.5, 0.8, 0.2, 0.3, 0.15, 0.15, 0.15])
+    weights = np.array([0.02, 0.05, 1, 1, 0.65, 0.5,
+                       0.8, 0.2, 0.3, 0.15, 0.15, 0.15])
 
     # Calculate the dot product of the two songs
     similarities = np.array([0.0]*weights.size)
@@ -87,8 +90,10 @@ def cosineSimilarity(song1, song2):
     # Return dot product of weights and similarities
     return np.dot(weights, similarities)/np.sum(weights)
 
+
 def takeSecond(elem):
     '''
     Take second element for sort
     '''
     return elem[1]
+
