@@ -1,3 +1,4 @@
+from time import sleep
 from django.http import HttpResponse
 import flask
 from flask import request, jsonify
@@ -22,6 +23,7 @@ def loadPickle():
     global database
     if "database" not in globals():
         database = pickle.load(urlopen("https://drive.google.com/uc?export=download&id=1OlMk7v2K2JZnOtehY8eRBEdw89NXIXWU&confirm=t"))
+        sleep(10)
         return jsonify("Database loaded")
     return jsonify("Database already loaded")
 
@@ -30,9 +32,8 @@ def songName():
     '''
     Returns a list of songs in the database that match the song title and their similarity score.
     '''
-    try:
-        global database
-    except:
+    global database
+    if "database" not in globals():
         return jsonify("Database not loaded")
 
     # Check if an name was provided as part of the URL.
@@ -49,9 +50,8 @@ def songRecommendation():
     '''
     Returns a list of songs in the database that are similar to the song and their similarity score.
     '''
-    try:
-        global database
-    except:
+    global database
+    if "database" not in globals():
         return jsonify("Database not loaded")
 
     # Check if an key was provided as part of the URL.
