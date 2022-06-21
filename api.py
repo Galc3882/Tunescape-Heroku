@@ -22,7 +22,7 @@ def loadData():
     Loads the database files
     '''
     
-    root = os.path.abspath(os.getcwd()) + r'\tmp'
+    root = os.path.abspath(os.getcwd()) + r'/tmp'
     pathList = []
     for path, subdirs, files in os.walk(root):
         for name in files:
@@ -31,11 +31,13 @@ def loadData():
     if len(pathList) == 0:
         # creat temp folder
         os.makedirs(root)
+
+        # download data
         # First one is namelist
         idList = ('1Rqrue1s6O4BPclNC0fkEkJm302JLqjjl', '1zDwM-vL87DpF762LGoWK-ITXZSGUd99_', '16yj4rBPqdgxK9qmA8tR08Kpo_iErNomL')
         idNames = ('namelist', 'database0', 'database1')
         for i in range(len(idList)):
-            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" + idList[i] + "&confirm=t", "tmp/" + idNames[i] + ".pickle")
+            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" + idList[i] + "&confirm=t", r"tmp/" + idNames[i] + r".pickle")
         return jsonify("Database loaded")
 
     return jsonify("Database already loaded")
