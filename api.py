@@ -55,8 +55,8 @@ def songName():
     else:
         return "Error: No name field provided. Please specify a name."
     
-    if os.path.isfile(os.path.abspath(os.getcwd()) + r'\tmp\namelist.pickle'):
-        return jsonify(Search.fuzzyGetSongTitle(name, os.path.abspath(os.getcwd()) + r'\tmp\namelist.pickle', 40))
+    if os.path.isfile(os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle'):
+        return jsonify(Search.fuzzyGetSongTitle(name, os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle', 40))
     return jsonify("Database not loaded")
 
     
@@ -76,7 +76,7 @@ def songRecommendation():
         return "Error: No key field provided. Please specify a key."
 
 
-    root = os.path.abspath(os.getcwd()) + r'\tmp'
+    root = os.path.abspath(os.getcwd()) + r'/tmp'
     pathList = []
     for path, subdirs, files in os.walk(root):
         for name in files:
