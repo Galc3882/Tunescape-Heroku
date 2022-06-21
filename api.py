@@ -29,6 +29,8 @@ def loadData():
             pathList.append(os.path.join(path, name))
 
     if len(pathList) == 0:
+        # creat temp folder
+        os.makedirs(root)
         # First one is namelist
         idList = ('1Rqrue1s6O4BPclNC0fkEkJm302JLqjjl', '1zDwM-vL87DpF762LGoWK-ITXZSGUd99_', '16yj4rBPqdgxK9qmA8tR08Kpo_iErNomL')
         idNames = ('namelist', 'database0', 'database1')
