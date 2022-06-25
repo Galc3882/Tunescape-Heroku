@@ -30,7 +30,8 @@ def loadData():
 
     if len(pathList) == 0:
         # creat temp folder
-        os.makedirs(root)
+        if not os.path.exists(root):
+            os.makedirs(root)
 
         # download data
         # First one is namelist
@@ -38,9 +39,19 @@ def loadData():
         idNames = ('namelist', 'database0', 'database1')
         for i in range(len(idList)):
             urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" + idList[i] + "&confirm=t", r"tmp/" + idNames[i] + r".pickle")
-        return jsonify("Database loaded")
+        response = jsonify("Database loaded")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
 
-    return jsonify("Database already loaded")
+    response = jsonify("Database already loaded")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add("Access-Control-Allow-Credentials", True)
+    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Methods", "GET")
+    return response
 
 @app.route('/api/songs', methods=['GET'])
 def songName():
@@ -53,11 +64,28 @@ def songName():
     if 'name' in request.args:
         name = request.args['name']
     else:
-        return "Error: No name field provided. Please specify a name."
+        response = jsonify( "Error: No name field provided. Please specify a name.")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
     
     if os.path.isfile(os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle'):
-        return jsonify(Search.fuzzyGetSongTitle(name, os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle', 40))
-    return jsonify("Database not loaded")
+        l = [[i[0].split('\0')[0], i[0].split('\0')[1]] for i in Search.fuzzyGetSongTitle(name, os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle', 40)]
+        response = jsonify({'array':l})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
+
+    response = jsonify("Database not loaded")
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add("Access-Control-Allow-Credentials", True)
+    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Methods", "GET")
+    return response
 
     
 
@@ -73,8 +101,12 @@ def songRecommendation():
         key = request.args['key']
         key = key.replace('\\u0000', '\0') 
     else:
-        return "Error: No key field provided. Please specify a key."
-
+        response = jsonify("Error: No key field provided. Please specify a key.")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
 
     root = os.path.abspath(os.getcwd()) + r'/tmp'
     pathList = []
@@ -84,7 +116,12 @@ def songRecommendation():
                 pathList.append(os.path.join(path, name))
 
     if len(pathList) == 0:
-        return jsonify("Database not loaded")
+        response = jsonify("Database not loaded")
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
 
     songValue = None
     # Find song value in the database
@@ -101,7 +138,12 @@ def songRecommendation():
         del data
         gc.collect()
     if songValue == None:
-        return jsonify(406)
+        response = jsonify("Song not found")    
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add("Access-Control-Allow-Credentials", True)
+        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Methods", "GET")
+        return response
 
     # Find most similar song using cosine similarity
     numOfSongs = 5
@@ -114,8 +156,12 @@ def songRecommendation():
     if len(sortedSimilarSongs) > numOfSongs:
         sortedSimilarSongs = sortedSimilarSongs[:numOfSongs]
     
-    return jsonify(sortedSimilarSongs)
-
+    response = jsonify({'array':sortedSimilarSongs})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add("Access-Control-Allow-Credentials", True)
+    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Methods", "GET")
+    return response
 
 # take second element for sort
 def takeSecond(elem):
