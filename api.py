@@ -29,7 +29,7 @@ def loadData():
             pathList.append(os.path.join(path, name))
 
     if len(pathList) == 0:
-        # creat temp folder
+        # create temp folder
         if not os.path.exists(root):
             os.makedirs(root)
 
@@ -99,7 +99,8 @@ def songRecommendation():
     # If not, then return an error in the HTTP response.
     if 'key' in request.args:
         key = request.args['key']
-        key = key.replace('\\u0000', '\0') 
+        key = key.split('\\u0000\\u0000')
+        key = [i.replace('\\u0000', '\0') for i in key] 
     else:
         response = jsonify("Error: No key field provided. Please specify a key.")
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -123,21 +124,18 @@ def songRecommendation():
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
-    songValue = None
+    songValues = []
     # Find song value in the database
     for path in pathList:
         with open(path, 'rb') as handle:
             data = pickle.load(handle)
             handle.close()
-            if key in data.keys():
-                songValue = data[key]
-                break
+            for song in key:
+                if song in data.keys():
+                    songValues.append(data[song])
         del data
         gc.collect()
-    if len(pathList) > 0:
-        del data
-        gc.collect()
-    if songValue == None:
+    if songValues == None:
         response = jsonify("Song not found")    
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
@@ -147,16 +145,10 @@ def songRecommendation():
 
     # Find most similar song using cosine similarity
     numOfSongs = 5
-    similarSongs = Search.multiProcessing(
-        Search.findSimilarSongs, 32, songValue, pathList, numOfSongs)
+    similarSongs = Search.reduceSongs(songValues, pathList, numOfSongs)
 
-    # Sort the list by the similarity score
-    sortedSimilarSongs = sorted(
-        similarSongs, key=Search.takeSecond, reverse=True)
-    if len(sortedSimilarSongs) > numOfSongs:
-        sortedSimilarSongs = sortedSimilarSongs[:numOfSongs]
-    
-    response = jsonify({'array':sortedSimilarSongs})
+
+    response = jsonify({'array':similarSongs})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add("Access-Control-Allow-Credentials", True)
     response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
