@@ -7,21 +7,42 @@ import Search
 import urllib
 import pickle
 import gc
+import Spotify_Search_v4
+import threading
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
 
 
-# @app.route('/', methods=['GET'])
-# def home():
-#     return '''<h1>Tunescape</h1>'''
+class MyWorker():
+
+    def __init__(self):
+        thread = threading.Thread(target=self.run, args=())
+        thread.daemon = True
+        thread.start()
+
+    def run(self):
+        root = os.path.abspath(os.getcwd()) + r'/tmp'
+        # create temp folder
+        if not os.path.exists(root):
+            os.makedirs(root)
+
+        # download data
+        # First one is namelist
+        idList = ('1zDwM-vL87DpF762LGoWK-ITXZSGUd99_',
+                  '16yj4rBPqdgxK9qmA8tR08Kpo_iErNomL')
+        idNames = ('database0', 'database1')
+        for i in range(len(idList)):
+            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" +
+                                       idList[i] + "&confirm=t", r"tmp/" + idNames[i] + r".pickle")
+
 
 @app.route('/api/loaddata', methods=['GET'])
 def loadData():
     '''
     Loads the database files
     '''
-    
+
     root = os.path.abspath(os.getcwd()) + r'/tmp'
     pathList = []
     for path, subdirs, files in os.walk(root):
@@ -29,29 +50,24 @@ def loadData():
             pathList.append(os.path.join(path, name))
 
     if len(pathList) == 0:
-        # create temp folder
-        if not os.path.exists(root):
-            os.makedirs(root)
+        MyWorker()
 
-        # download data
-        # First one is namelist
-        idList = ('1Rqrue1s6O4BPclNC0fkEkJm302JLqjjl', '1zDwM-vL87DpF762LGoWK-ITXZSGUd99_', '16yj4rBPqdgxK9qmA8tR08Kpo_iErNomL')
-        idNames = ('namelist', 'database0', 'database1')
-        for i in range(len(idList)):
-            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" + idList[i] + "&confirm=t", r"tmp/" + idNames[i] + r".pickle")
         response = jsonify("Database loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
     response = jsonify("Database already loaded")
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add("Access-Control-Allow-Credentials", True)
-    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Headers",
+                         "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
     response.headers.add("Access-Control-Allow-Methods", "GET")
     return response
+
 
 @app.route('/api/songs', methods=['GET'])
 def songName():
@@ -64,30 +80,24 @@ def songName():
     if 'name' in request.args:
         name = request.args['name']
     else:
-        response = jsonify( "Error: No name field provided. Please specify a name.")
+        response = jsonify(
+            "Error: No name field provided. Please specify a name.")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
-        response.headers.add("Access-Control-Allow-Methods", "GET")
-        return response
-    
-    if os.path.isfile(os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle'):
-        l = [[i[0].split('\0')[0], i[0].split('\0')[1]] for i in Search.fuzzyGetSongTitle(name, os.path.abspath(os.getcwd()) + r'/tmp/namelist.pickle', 40)]
-        response = jsonify({'array':l})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
-    response = jsonify("Database not loaded")
+    sp = Spotify_Search_v4.authentiated_spotipy()
+    response = jsonify({'array': Spotify_Search_v4.search(name, sp)})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add("Access-Control-Allow-Credentials", True)
-    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Headers",
+                         "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
     response.headers.add("Access-Control-Allow-Methods", "GET")
     return response
 
-    
 
 @app.route('/api/recommend', methods=['GET'])
 def songRecommendation():
@@ -100,12 +110,14 @@ def songRecommendation():
     if 'key' in request.args:
         key = request.args['key']
         key = key.split('\\u0000\\u0000')
-        key = [i.replace('\\u0000', '\0') for i in key] 
+        key = [i.replace('\\u0000', '\0') for i in key]
     else:
-        response = jsonify("Error: No key field provided. Please specify a key.")
+        response = jsonify(
+            "Error: No key field provided. Please specify a key.")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
@@ -120,7 +132,8 @@ def songRecommendation():
         response = jsonify("Database not loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
@@ -135,11 +148,12 @@ def songRecommendation():
                     songValues.append(data[song])
         del data
         gc.collect()
-    if songValues == None:
-        response = jsonify("Song not found")    
+    if songValues == []:
+        response = jsonify("Songs not found")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+        response.headers.add("Access-Control-Allow-Headers",
+                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
 
@@ -147,17 +161,20 @@ def songRecommendation():
     numOfSongs = 5
     similarSongs = Search.reduceSongs(songValues, pathList, numOfSongs)
 
-
-    response = jsonify({'array':similarSongs})
+    response = jsonify({'array': similarSongs})
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add("Access-Control-Allow-Credentials", True)
-    response.headers.add("Access-Control-Allow-Headers", "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
+    response.headers.add("Access-Control-Allow-Headers",
+                         "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
     response.headers.add("Access-Control-Allow-Methods", "GET")
     return response
 
 # take second element for sort
+
+
 def takeSecond(elem):
     return elem[1]
+
 
 if __name__ == '__main__':
     #HttpResponse('Hello! ' * times)
