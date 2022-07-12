@@ -1,6 +1,4 @@
-import secrets
 import spotipy
-import time
 from datetime import timedelta
 from spotipy.oauth2 import SpotifyClientCredentials
 
