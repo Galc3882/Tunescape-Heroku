@@ -39,6 +39,9 @@ class MyWorker():
         # download data
         # First one is namelist
         id = '1Tqzp545fieWEcNSR-KIWh4PdKTnDdW9X'
+        opener=urllib.request.build_opener()
+        opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+        urllib.request.install_opener(opener)
         urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" +
                                        id + "&confirm=t", r"tmp/db.zip")
         # unzip data
