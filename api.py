@@ -37,8 +37,7 @@ class MyWorker():
             os.makedirs(root)
 
         # download data
-        # First one is namelist
-        id = '1Tqzp545fieWEcNSR-KIWh4PdKTnDdW9X'
+        id = '1q3M_jcxlmrdk8DvwUPo-4PfAppAt34_P'
         opener=urllib.request.build_opener()
         opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
         urllib.request.install_opener(opener)
