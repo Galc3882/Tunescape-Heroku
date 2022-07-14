@@ -148,7 +148,7 @@ def multiProcessing(func, batch, song, excludeSongs, pathList, n):
     # randomise the order of the paths
     np.random.shuffle(pathList)
 
-    pathList = pathList[:10]
+    pathList = pathList[:3]
 
     if len(pathList) > batch:
         # Split the pathList into list of batch sized lists
