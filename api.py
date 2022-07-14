@@ -26,6 +26,10 @@ class MyWorker():
         '''
         This function loads the database
         '''
+        # delete all the files in the folder tmp
+        for file in os.listdir("tmp"):
+            os.remove("tmp/" + file)
+
         root = os.path.abspath(os.getcwd()) + r'/tmp'
         # create temp folder
         if not os.path.exists(root):
@@ -49,6 +53,9 @@ def loadData():
     '''
     Loads the database files
     '''
+    force = 'false'
+    if 'f' in request.args:
+        force = request.args['f']
 
     root = os.path.abspath(os.getcwd()) + r'/tmp'
     pathList = []
@@ -56,7 +63,7 @@ def loadData():
         for name in files:
             pathList.append(os.path.join(path, name))
 
-    if len(pathList) == 0:
+    if len(pathList) == 0 or force == 'true':
         MyWorker()
 
         response = jsonify("Database loaded")
@@ -132,10 +139,9 @@ def songRecommendation():
     pathList = []
     for path, subdirs, files in os.walk(root):
         for name in files:
-            if not name.startswith("namelist"):
-                pathList.append(os.path.join(path, name))
+            pathList.append(os.path.join(path, name))
 
-    if len(pathList) == 0:
+    if len(pathList) != 200:
         response = jsonify("Database not loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
@@ -155,7 +161,7 @@ def songRecommendation():
                     songValues.append(data[song])
         del data
         gc.collect()
-    if songValues == []:
+    if len(songValues) < len(key):
         response = jsonify("Songs not found")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
