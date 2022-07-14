@@ -1,4 +1,5 @@
 from time import sleep
+from zipfile import ZipFile
 from django.http import HttpResponse
 import flask
 from flask import request, jsonify
@@ -22,6 +23,9 @@ class MyWorker():
         thread.start()
 
     def run(self):
+        '''
+        This function loads the database
+        '''
         root = os.path.abspath(os.getcwd()) + r'/tmp'
         # create temp folder
         if not os.path.exists(root):
@@ -29,12 +33,15 @@ class MyWorker():
 
         # download data
         # First one is namelist
-        idList = ('1zDwM-vL87DpF762LGoWK-ITXZSGUd99_',
-                  '16yj4rBPqdgxK9qmA8tR08Kpo_iErNomL')
-        idNames = ('database0', 'database1')
-        for i in range(len(idList)):
-            urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" +
-                                       idList[i] + "&confirm=t", r"tmp/" + idNames[i] + r".pickle")
+        id = '1Tqzp545fieWEcNSR-KIWh4PdKTnDdW9X'
+        urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" +
+                                       id + "&confirm=t", r"tmp/db.zip")
+        # unzip data
+        with ZipFile(r"tmp/db.zip", 'r') as zip_ref:
+            zip_ref.extractall(r"tmp/")
+
+        # delete zip file
+        os.remove(r"tmp/db.zip")
 
 
 @app.route('/api/loaddata', methods=['GET'])
@@ -98,7 +105,7 @@ def songName():
     response.headers.add("Access-Control-Allow-Methods", "GET")
     return response
 
-
+# TODO: change this to spotify and make it work
 @app.route('/api/recommend', methods=['GET'])
 def songRecommendation():
     '''
@@ -169,13 +176,13 @@ def songRecommendation():
     response.headers.add("Access-Control-Allow-Methods", "GET")
     return response
 
-# take second element for sort
-
 
 def takeSecond(elem):
+    '''
+    take second element for sort
+    '''
     return elem[1]
 
 
 if __name__ == '__main__':
-    #HttpResponse('Hello! ' * times)
     app.run()
