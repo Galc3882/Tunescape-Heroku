@@ -1,15 +1,13 @@
-from time import sleep
-from zipfile import ZipFile
-from django.http import HttpResponse
+import time
 import flask
 from flask import request, jsonify
 import os
 import Search
-import urllib
 import pickle
 import gc
 import Spotify_Search_v4
 import threading
+import gdown
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
@@ -36,19 +34,7 @@ class MyWorker():
         if not os.path.exists(root):
             os.makedirs(root)
 
-        # download data
-        id = '1q3M_jcxlmrdk8DvwUPo-4PfAppAt34_P'
-        opener=urllib.request.build_opener()
-        opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
-        urllib.request.install_opener(opener)
-        urllib.request.urlretrieve("https://drive.google.com/uc?export=download&id=" +
-                                       id + "&confirm=t", r"tmp/db.zip")
-        # unzip data
-        with ZipFile(r"tmp/db.zip", 'r') as zip_ref:
-            zip_ref.extractall(r"tmp/")
-
-        # delete zip file
-        os.remove(r"tmp/db.zip")
+        gdown.download_folder('https://drive.google.com/drive/folders/1WsSB9YxeR7WxZ3o0d3gGcpBFlsrgaEO5', quiet=True, use_cookies=False)
 
 
 @app.route('/api/loaddata', methods=['GET'])
@@ -125,9 +111,9 @@ def songRecommendation():
     # Check if an key was provided as part of the URL.
     # If not, then return an error in the HTTP response.
     if 'key' in request.args:
-        key = request.args['key']
-        key = key.split('\\u0000\\u0000')
-        key = [i.replace('\\u0000', '\0') for i in key]
+        keys = request.args['key']
+        keys = keys.split('\\u0000\\u0000')
+        keys = [i.replace('\\u0000', '\0') for i in keys]
     else:
         response = jsonify(
             "Error: No key field provided. Please specify a key.")
@@ -144,7 +130,7 @@ def songRecommendation():
         for name in files:
             pathList.append(os.path.join(path, name))
 
-    if len(pathList) != 200:
+    if len(pathList) == 0:
         response = jsonify("Database not loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
@@ -152,30 +138,17 @@ def songRecommendation():
                              "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
         response.headers.add("Access-Control-Allow-Methods", "GET")
         return response
-
-    songValues = []
-    # Find song value in the database
-    for path in pathList:
-        with open(path, 'rb') as handle:
-            data = pickle.load(handle)
-            handle.close()
-            for song in key:
-                if song in data.keys():
-                    songValues.append(data[song])
-        del data
-        gc.collect()
-    if len(songValues) < len(key):
-        response = jsonify("Songs not found")
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add("Access-Control-Allow-Credentials", True)
-        response.headers.add("Access-Control-Allow-Headers",
-                             "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale")
-        response.headers.add("Access-Control-Allow-Methods", "GET")
-        return response
-
+ 
     # Find most similar song using cosine similarity
     numOfSongs = 5
+
+    # print time taken for this function
+    start = time.time()
+    sp = Spotify_Search_v4.authentiated_spotipy()
+    songValues = [[key.split("\0")[0]]+[key.split("\0")[1]]+Spotify_Search_v4.get_features(key.split("\0")[2], sp) for key in keys]
     similarSongs = Search.reduceSongs(songValues, pathList, numOfSongs)
+    end = time.time()
+    print("Time taken for this function: " + str(end - start))
 
     response = jsonify({'array': similarSongs})
     response.headers.add('Access-Control-Allow-Origin', '*')

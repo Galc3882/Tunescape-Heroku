@@ -10,3 +10,4 @@ whitenoise
 python-Levenshtein
 scikit-learn
 spotipy
+gdown
