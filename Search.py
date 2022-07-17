@@ -44,8 +44,8 @@ def findSimilarSongs(song, paths, numOfSongs=1, excludeSongs=[], q=None):
     Finds the most similar songs to the song at the index.
     Returns the most similar songs using cosine similarity.
     """
-    # for every 5 paths instead of 1
-    batch = 5
+    # for every 2 paths instead of 1
+    batch = 2
     if len(paths) > batch:
         # Split the pathList into list of batch sized lists
         paths = np.array_split(paths, int(len(paths)/batch))
@@ -148,7 +148,7 @@ def multiProcessing(func, batch, song, excludeSongs, pathList, n):
     # randomise the order of the paths
     np.random.shuffle(pathList)
 
-    pathList = pathList[:6]
+    pathList = pathList[:5]
 
     if len(pathList) > batch:
         # Split the pathList into list of batch sized lists
