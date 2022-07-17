@@ -6,36 +6,10 @@ import Search
 import pickle
 import gc
 import Spotify_Search_v4
-import threading
-import gdown
+import download
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = False
-
-
-class MyWorker():
-
-    def __init__(self):
-        thread = threading.Thread(target=self.run, args=())
-        thread.daemon = True
-        thread.start()
-
-    def run(self):
-        '''
-        This function loads the database
-        '''
-        # delete all the files in the folder tmp
-        if os.path.exists('tmp'):
-            for file in os.listdir("tmp"):
-                os.remove("tmp/" + file)
-
-        root = os.path.abspath(os.getcwd()) + r'/tmp'
-        # create temp folder
-        if not os.path.exists(root):
-            os.makedirs(root)
-
-        gdown.download_folder('https://drive.google.com/drive/folders/1WsSB9YxeR7WxZ3o0d3gGcpBFlsrgaEO5', quiet=True, use_cookies=False)
-
 
 @app.route('/api/loaddata', methods=['GET'])
 def loadData():
@@ -53,7 +27,7 @@ def loadData():
             pathList.append(os.path.join(path, name))
 
     if len(pathList) == 0 or force == 'true':
-        MyWorker()
+        download.MyWorker()
 
         response = jsonify("Database loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -130,7 +104,7 @@ def songRecommendation():
         for name in files:
             pathList.append(os.path.join(path, name))
 
-    if len(pathList) == 0:
+    if len(pathList) < 4:
         response = jsonify("Database not loaded")
         response.headers.add('Access-Control-Allow-Origin', '*')
         response.headers.add("Access-Control-Allow-Credentials", True)
@@ -143,12 +117,9 @@ def songRecommendation():
     numOfSongs = 5
 
     # print time taken for this function
-    start = time.time()
     sp = Spotify_Search_v4.authentiated_spotipy()
     songValues = [[key.split("\0")[0]]+[key.split("\0")[1]]+Spotify_Search_v4.get_features(key.split("\0")[2], sp) for key in keys]
     similarSongs = Search.reduceSongs(songValues, pathList, numOfSongs)
-    end = time.time()
-    print("Time taken for this function: " + str(end - start))
 
     response = jsonify({'array': similarSongs})
     response.headers.add('Access-Control-Allow-Origin', '*')
