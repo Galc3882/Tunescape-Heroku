@@ -141,14 +141,14 @@ def cosineSimilarity(song1, song2):
     # Return dot product of weights and similarities
     return np.dot(weights, similarities)/np.sum(weights)
 
-def multiProcessing(func, batch, song, excludeSongs, pathList, n): 
+def multiProcessing(func, batch, cutoff, song, excludeSongs, pathList, n): 
     """
     Multi-processing function.
     """
     # randomise the order of the paths
     np.random.shuffle(pathList)
 
-    pathList = pathList[:5]
+    pathList = pathList[:cutoff]
 
     if len(pathList) > batch:
         # Split the pathList into list of batch sized lists
@@ -227,7 +227,7 @@ def reduceSongs(songList, pathList, numOfSongs):
 
     similarSongs = []
     for song in reducedSongList:
-        similarSongs += (multiProcessing(Search.findSimilarSongs, 8, song, excludeSongs, pathList, numOfSongs))
+        similarSongs += (multiProcessing(Search.findSimilarSongs, 8, int(12/len(reducedSongList)), song, excludeSongs, pathList, numOfSongs))
 
     # remove duplicates
     similarSongs = list(dict.fromkeys(similarSongs))
