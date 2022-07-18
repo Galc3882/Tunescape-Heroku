@@ -44,8 +44,7 @@ def findSimilarSongs(song, paths, numOfSongs=1, excludeSongs=[], q=None):
     Finds the most similar songs to the song at the index.
     Returns the most similar songs using cosine similarity.
     """
-    # for every 2 paths instead of 1
-    batch = 2
+    batch = 1
     if len(paths) > batch:
         # Split the pathList into list of batch sized lists
         paths = np.array_split(paths, int(len(paths)/batch))
@@ -227,7 +226,7 @@ def reduceSongs(songList, pathList, numOfSongs):
 
     similarSongs = []
     for song in reducedSongList:
-        similarSongs += (multiProcessing(Search.findSimilarSongs, 8, int(12/len(reducedSongList)), song, excludeSongs, pathList, numOfSongs))
+        similarSongs += (multiProcessing(Search.findSimilarSongs, 4, int(12/len(reducedSongList)), song, excludeSongs, pathList, numOfSongs))
 
     # remove duplicates
     similarSongs = list(dict.fromkeys(similarSongs))
@@ -240,7 +239,7 @@ def reduceSongs(songList, pathList, numOfSongs):
 
 def avarageArray(arrays):
     """
-    calculates the average of array as the combinaton of multipul arrays with different lengths
+    calculates the average of array as the combinaton of multipule arrays with different lengths
     """
     arr = [0]*len(arrays)
     a = []
