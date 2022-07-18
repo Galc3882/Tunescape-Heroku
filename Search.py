@@ -159,33 +159,28 @@ def multiProcessing(func, batch, song, excludeSongs, pathList, n):
     songList = []
     i = 0
     resultQueue = mp.Queue()
+    
+    processes = []
+    for i in range(min(len(pathList), batch)):
+        p = mp.Process(target=func, args=(song, pathList[i], n, excludeSongs, resultQueue))
+        processes.append(p)
 
-    while i < len(pathList):
-        j = 0
-        while j < batch:
-            if i == len(pathList):
+    for p in processes:
+        p.start()
+
+    while True:
+        try:
+            result = resultQueue.get(False, 0.01)
+            songList += result
+        except queue.Empty:
+            pass
+        allExited = True
+        for t in processes:
+            if t.exitcode is None:
+                allExited = False
                 break
-
-            processes = []
-            p = mp.Process(target=func, args=(song, pathList[i], n, excludeSongs, resultQueue))
-            processes.append(p)
-            p.start()
-            i += 1
-            j += 1
-
-        while True:
-            try:
-                result = resultQueue.get(False, 0.01)
-                songList += result
-            except queue.Empty:
-                pass
-            allExited = True
-            for t in processes:
-                if t.exitcode is None:
-                    allExited = False
-                    break
-            if allExited & resultQueue.empty():
-                break
+        if allExited & resultQueue.empty():
+            break
     
     return songList
 
