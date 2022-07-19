@@ -48,7 +48,16 @@ def search(track_name, sp, debug=False):
                 duration = duration[2:7]
         else:
             duration = duration[:7]
-        album_art = result['tracks']['items'][i]['album']['images'][2]['url']
+        if debug:
+            if len(result['tracks']['items'][i]['album']['images']) == 0:
+                print("DEBUG: ALBUM ART:",
+                      result['tracks']['items'][i]['album']['images'])
+                print("DEBUG: ID:", result['tracks']
+                      ['items'][i]['external_urls']['spotify'])
+        if len(result['tracks']['items'][i]['album']['images']) == 0:
+            album_art = "https://i.pinimg.com/originals/cb/68/7c/cb687c23588e2d441bedd63647a8f9bd.png"
+        else:
+            album_art = result['tracks']['items'][i]['album']['images'][2]['url']
         release_date = result['tracks']['items'][i]['album']['release_date']
         popularity = result['tracks']['items'][i]['popularity']
         explicit = result['tracks']['items'][i]['explicit']
@@ -91,7 +100,7 @@ def get_features(track_id, sp, debug=False):
         print(get_audio_features[0].keys())
     #track = get_audio_features[0]['track_name']
     #artist = get_audio_features[0]['artist_name']
-    duration = int(get_audio_features[0]['duration_ms']/1000)
+    duration = get_audio_features[0]['duration_ms']/1000
     key = get_audio_features[0]['key']
     mode = get_audio_features[0]['mode']
     tempo = get_audio_features[0]['tempo']
@@ -118,13 +127,13 @@ def get_features(track_id, sp, debug=False):
     tatums_start = np.array([i['start']for i in get_audio_analysis['tatums']])
 
     result = [duration, key, mode, tempo, loudness, time_signature, year, section_starts,
-                       segment_pitches, segment_timbre, bars_start, beats_start, tatums_start]
+              segment_pitches, segment_timbre, bars_start, beats_start, tatums_start]
     return result
 
 
 if __name__ == "__main__":
     sp = authentiated_spotipy()
-    tracks = search("Sweet Caroline", sp)
+    tracks = search("debussy ce qu'a vu le vent de l'ouest", sp, debug=True)
     print(tracks[0])
     start_time = time.time()
     features = get_features(tracks[0][8], sp)
